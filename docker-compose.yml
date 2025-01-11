@@ -1,0 +1,47 @@
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v3.2
+    # Enables the web UI and tells Traefik to listen to docker
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"  # Define the websecure entry point for HTTPS
+      - "--certificatesresolvers.myresolver.acme.email=jamesmichael0444@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+      # HTTPS port
+      - "443:443"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - traefik_network
+
+  fastapi-backend:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`oai.tools.ingenio.my.id`) && PathPrefix(`/`)"
+      - "traefik.http.routers.fastapi.entrypoints=websecure"
+      - "traefik.http.services.fastapi.loadbalancer.server.port=9000"
+      - "traefik.http.routers.fastapi.tls.certresolver=myresolver"
+    networks:
+      - traefik_network
+
+networks:
+ traefik_network:
+   driver: bridge
