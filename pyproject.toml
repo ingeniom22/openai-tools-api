@@ -5,10 +5,13 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "bs4>=0.0.2",
     "fastapi[standard]>=0.115.6",
+    "ipykernel>=6.29.5",
     "langchain-community>=0.3.14",
     "langchain-neo4j>=0.2.0",
     "langchain-openai>=0.3.0",
     "langchain>=0.3.14",
     "neo4j>=5.27.0",
+    "pip>=24.3.1",
 ]
