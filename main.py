@@ -149,6 +149,8 @@ async def search_ekatalog(request: LKPPSearchRequest) -> list:
 
             results.append({"title": title, "url": url, "desc": desc})
 
+
+        # return {"query": request.query, "result": results}
         return results
 
     except requests.exceptions.RequestException as e:
